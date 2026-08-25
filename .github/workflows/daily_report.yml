@@ -1,0 +1,44 @@
+name: Daily Exit-Survey Report
+
+# Runs every day at 05:00 IST (UTC+05:30 -> 23:30 UTC the previous day).
+on:
+  schedule:
+    - cron: "30 23 * * *"
+  workflow_dispatch: {}        # allows a manual run from the Actions tab
+
+permissions: {}                # no special permissions needed
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -e .
+
+      - name: Run pipeline (generates report + figures)
+        run: python scripts/run_pipeline.py
+
+      - name: Build styled HTML email
+        run: python scripts/build_email.py
+
+      - name: Send email
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          EMAIL_SUBJECT: "Daily Employee Exit Survey Report"
+        run: python scripts/send_email.py

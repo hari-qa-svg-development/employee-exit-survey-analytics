@@ -41,6 +41,7 @@ data/processed/*.csv
 reports/figures/*.png
 reports/run_summary.md
 reports/run_summary.json
+reports/email_report.html
 
 # Keep directory structure with .gitkeep
 !data/raw/.gitkeep

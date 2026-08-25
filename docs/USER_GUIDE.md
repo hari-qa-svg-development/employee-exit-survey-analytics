@@ -14,8 +14,9 @@ Analytics project.
 5. [Understanding the outputs](#understanding-the-outputs)
 6. [Running individual stages](#running-individual-stages)
 7. [Using the notebook](#using-the-notebook)
-8. [Troubleshooting](#troubleshooting)
-9. [FAQ](#faq)
+8. [Daily automated email report](#daily-automated-email-report)
+9. [Troubleshooting](#troubleshooting)
+10. [FAQ](#faq)
 
 ---
 
@@ -249,6 +250,62 @@ The notebook:
 
 > Tip: use it to experiment. Edit a transform, re-run the cell, and see how
 > the outputs change before committing the change back to the module.
+
+---
+
+## Daily automated email report
+
+The repo ships a scheduled GitHub Actions workflow
+(`.github/workflows/daily_report.yml`) that:
+
+1. Runs the **entire pipeline** every day at **05:00 IST** (23:30 UTC).
+2. Builds a **styled HTML email** from the insights report
+   (`scripts/build_email.py`) with the charts embedded inline.
+3. Sends it via SMTP (`scripts/send_email.py`).
+
+### Configure the secrets
+
+In **Settings → Secrets and variables → Actions** on GitHub, add:
+
+| Secret | Example |
+|--------|---------|
+| `SMTP_HOST` | `smtp.gmail.com` |
+| `SMTP_PORT` | `587` |
+| `SMTP_USER` | your login / sending address |
+| `SMTP_PASS` | app password (not your normal password) |
+| `EMAIL_FROM` | the sender address |
+| `EMAIL_TO` | comma-separated recipients, e.g. `hr@company.com, boss@company.com` |
+
+> For Gmail, enable **2-Step Verification** and create an **App Password**
+> (https://myaccount.google.com/apppasswords); use that as `SMTP_PASS`.
+
+### Trigger it
+
+- **Automatic:** runs daily at 05:00 IST. (GitHub may delay scheduled runs on
+  repos with no activity for 60+ days.)
+- **Manual:** `Actions → Daily Exit-Survey Report → Run workflow`, or push a
+  commit.
+
+### Run locally (e.g. to preview)
+
+```bash
+python scripts/run_pipeline.py
+python scripts/build_email.py
+SMTP_HOST=smtp.gmail.com SMTP_PORT=587 SMTP_USER=you@gmail.com \
+SMTP_PASS=app-pass EMAIL_FROM=you@gmail.com EMAIL_TO=boss@company.com \
+python scripts/send_email.py            # actually sends
+
+# or preview without sending:
+python scripts/send_email.py --dry-run
+```
+
+### Notes
+
+- The default schedule is 05:00 **IST** (`30 23 * * *` UTC). Edit the `cron:`
+  line to change the time or use a different timezone.
+- The raw data is **synthetic and reproducible** (fixed seed). The email will
+  look the same each day until you plug in real surveys (see the
+  [Data Dictionary](DATA_DICTIONARY.md) for wiring your own files).
 
 ---
 
