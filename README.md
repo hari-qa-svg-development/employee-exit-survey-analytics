@@ -62,6 +62,16 @@ notebooks/analysis.ipynb                  # interactive walkthrough
 
 ---
 
+## Documentation
+
+| Document | What it covers |
+|----------|----------------|
+| [User Guide](docs/USER_GUIDE.md) | Setup, installation, quick start, outputs, troubleshooting, FAQ |
+| [Pipeline Reference](docs/PIPELINE_REFERENCE.md) | Every module and function explained, data flow diagram |
+| [Data Dictionary](docs/DATA_DICTIONARY.md) | Every field, allowed values, business rules, configurable thresholds |
+
+---
+
 ## Dissatisfaction business rule
 
 - **DETE:** an employee is *dissatisfied* when **none** of the benign
