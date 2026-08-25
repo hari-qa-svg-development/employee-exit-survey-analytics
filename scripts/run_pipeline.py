@@ -38,6 +38,11 @@ def run() -> dict:
     cfg.FIGURES_DIR.mkdir(parents=True, exist_ok=True)
 
     print("1/7  Loading raw surveys ...")
+    if not cfg.DETE_RAW_PATH.exists() or not cfg.TAFE_RAW_PATH.exists():
+        print("    raw surveys missing -> generating with scripts/generate_raw_data.py")
+        from scripts.generate_raw_data import main as generate_raw_data
+
+        generate_raw_data()
     raw_dete, raw_tafe = load_dete(), load_tafe()
 
     print("2/7  Cleaning ...")
